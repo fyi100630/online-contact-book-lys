@@ -10,6 +10,16 @@ createApp({
       return `${year}-${month}-${day}`;
     }
 
+    function getNextDayString(dateStr) {
+      const target = dateStr || getTodayString();
+      const [y, m, d] = target.split('-').map(Number);
+      const next = new Date(y, m - 1, d + 1);
+      const ny = next.getFullYear();
+      const nm = String(next.getMonth() + 1).padStart(2, '0');
+      const nd = String(next.getDate()).padStart(2, '0');
+      return `${ny}-${nm}-${nd}`;
+    }
+
     function formatDateWithWeekday(dateStr) {
       if (!dateStr) return '';
       const [year, month, day] = dateStr.split('-');
@@ -171,7 +181,7 @@ createApp({
       subject: '',
       title: '',
       details: '',
-      dueDate: ''
+      dueDate: getNextDayString(getTodayString())
     });
 
     function openAddModal(category = 'homework') {
@@ -182,7 +192,7 @@ createApp({
       formItem.subject = '';
       formItem.title = '';
       formItem.details = '';
-      formItem.dueDate = '';
+      formItem.dueDate = getNextDayString(formItem.date);
       showEditModal.value = true;
     }
 
