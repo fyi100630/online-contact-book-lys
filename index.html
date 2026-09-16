@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>班級聯絡簿</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857'
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'system-ui', '-apple-system', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+
+  <style>
+    body {
+      font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+      background-color: #f1f5f9;
+      background-image: 
+        radial-gradient(at 10% 10%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+        radial-gradient(at 90% 15%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 85%, rgba(244, 63, 94, 0.10) 0px, transparent 50%),
+        radial-gradient(at 85% 85%, rgba(245, 158, 11, 0.12) 0px, transparent 50%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    .liquid-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.65;
+      animation: floatOrb 24s ease-in-out infinite alternate;
+    }
+    .liquid-orb-1 {
+      width: 480px;
+      height: 480px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.05) 70%);
+      top: -100px;
+      left: -80px;
+      animation-duration: 22s;
+    }
+    .liquid-orb-2 {
+      width: 520px;
+      height: 520px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, rgba(79, 70, 229, 0.05) 70%);
+      top: 25%;
+      right: -120px;
+      animation-duration: 28s;
+      animation-delay: -5s;
+    }
+    .liquid-orb-3 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(244, 63, 94, 0.25) 0%, rgba(225, 29, 72, 0.05) 70%);
+      bottom: -100px;
+      left: 15%;
+      animation-duration: 25s;
+      animation-delay: -10s;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0px, 0px) scale(1); }
+      33% { transform: translate(40px, -60px) scale(1.08); }
+      66% { transform: translate(-30px, 40px) scale(0.95); }
+      100% { transform: translate(25px, -20px) scale(1.03); }
+    }
+
+    .liquid-glass-nav {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+    }
+
+    .liquid-glass-card {
+      background: rgba(255, 255, 255, 0.68);
+      backdrop-filter: blur(20px) saturate(175%);
+      -webkit-backdrop-filter: blur(20px) saturate(175%);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .liquid-glass-card:hover {
+      background: rgba(255, 255, 255, 0.78);
+      border-color: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 14px 38px -6px rgba(15, 23, 42, 0.09);
+    }
+
+    .liquid-glass-pill {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      border-radius: 9999px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+      transition: all 0.2s ease;
+    }
+    .liquid-glass-pill:hover {
+      background: rgba(255, 255, 255, 0.85);
+      transform: translateY(-1px);
+    }
+
+    .liquid-item-row {
+      background: rgba(255, 255, 255, 0.62);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 1rem;
+      transition: all 0.2s ease;
+    }
+    .liquid-item-row:hover {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(255, 255, 255, 0.95);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    }
+
+    .liquid-modal-panel {
+      background: rgba(255, 255, 255, 0.90);
+      backdrop-filter: blur(32px) saturate(190%);
+      -webkit-backdrop-filter: blur(32px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 1.75rem;
+      box-shadow: 0 25px 65px -10px rgba(15, 23, 42, 0.2);
+    }
+
+    .liquid-input {
+      background: rgba(255, 255, 255, 0.7) !important;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(203, 213, 225, 0.6) !important;
+      border-radius: 0.75rem !important;
+      padding-left: 1.25rem !important;
+      padding-right: 1.25rem !important;
+      transition: all 0.2s ease;
+    }
+    .liquid-input:focus {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border-color: rgba(16, 185, 129, 0.7) !important;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
+    }
+
+    [v-cloak] {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased flex flex-col min-h-screen">
+
+  <div class="liquid-orb liquid-orb-1"></div>
+  <div class="liquid-orb liquid-orb-2"></div>
+  <div class="liquid-orb liquid-orb-3"></div>
+
+  <div id="app" v-cloak class="relative z-10 flex flex-col flex-1">
+
+    <!-- 頂端導航列 -->
+    <header class="sticky top-0 z-40 liquid-glass-nav py-3.5 px-4 sm:px-8">
+      <div class="max-w-[1700px] mx-auto flex justify-between items-center gap-4">
+        
+        <!-- 標題與日期 -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white shadow-md shadow-emerald-500/25 text-xl font-bold">
+            📖
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-tight">
+                {{ classTitle }}
+              </h1>
+              <span v-if="isSaving" class="text-[10px] text-amber-700 bg-amber-100/80 border border-amber-300/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span> 同步儲存中
+              </span>
+              <span v-else-if="isCloudConnected" class="text-[10px] text-emerald-700 bg-emerald-100/80 border border-emerald-300/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 即時連線中
+              </span>
+              <span v-else-if="hasFirebaseConfig" class="text-[10px] text-amber-700 bg-amber-100/80 border border-amber-300/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> 連線中...
+              </span>
+              <span v-else class="text-[10px] text-slate-600 bg-slate-100/80 border border-slate-300/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> 本機模式
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 font-medium">
+              {{ formatDateWithWeekday(currentDate) }}
+            </p>
+          </div>
+        </div>
+
+        <!-- 右側操作按鈕群 -->
+        <div class="flex items-center gap-2.5">
+          <!-- 檢視模式切換 (本日 / 全部) -->
+          <div class="inline-flex liquid-glass-pill p-1">
+            <button @click="viewMode = 'daily'" :class="viewMode === 'daily' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'" class="px-3 py-1 text-xs rounded-full transition">
+              本日
+            </button>
+            <button @click="viewMode = 'all'" :class="viewMode === 'all' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'" class="px-3 py-1 text-xs rounded-full transition">
+              全部
+            </button>
+          </div>
+
+          <!-- 編輯模式切換開關 (防呆防誤觸) -->
+          <button @click="isEditMode = !isEditMode" :class="isEditMode ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-500/30' : 'liquid-glass-pill text-slate-700 hover:text-slate-900 font-medium'" class="px-3.5 py-1.5 text-xs rounded-full transition flex items-center gap-1">
+            <span>{{ isEditMode ? '✏️ 編輯模式中' : '👁️ 唯讀模式' }}</span>
+          </button>
+
+          <!-- 新增項目按鈕 (僅編輯模式顯示) -->
+          <button v-if="isEditMode" @click="openAddModal('homework')" class="px-3.5 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-full shadow-md shadow-emerald-500/30 transition flex items-center gap-1">
+            <span>＋ 新增</span>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- 主要內容區 -->
+    <main class="max-w-[1700px] w-full mx-auto px-4 sm:px-8 py-6 flex-1 flex flex-col gap-6">
+
+      <!-- 日期切換操作列 (在本日模式下顯示) -->
+      <div v-if="viewMode === 'daily'" class="liquid-glass-card p-4 flex flex-wrap justify-between items-center gap-3">
+        <div class="flex items-center gap-2">
+          <button @click="changeDay(-1)" class="liquid-glass-pill px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-white">
+            ◀ 前一日
+          </button>
+          <button @click="goToday" :disabled="isToday" class="liquid-glass-pill px-3.5 py-1.5 text-xs font-semibold text-slate-700 disabled:opacity-40 hover:bg-white">
+            今日
+          </button>
+          <button @click="changeDay(1)" class="liquid-glass-pill px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-white">
+            後一日 ▶
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-slate-500 font-medium hidden sm:inline">選擇日期：</span>
+          <input id="mainDatePickerInput" type="date" v-model="currentDate" class="liquid-glass-pill px-3 py-1.5 text-xs text-slate-800 font-bold focus:outline-none cursor-pointer">
+        </div>
+      </div>
+
+      <!-- 四大板塊格線 (作業、考試、繳交、提醒) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 flex-1">
+
+        <!-- 1. 作業 (Homework) -->
+        <section class="liquid-glass-card p-5 flex flex-col">
+          <div class="flex justify-between items-center pb-3 mb-3 border-b border-emerald-500/20">
+            <div class="flex items-center gap-2">
+              <span class="p-1.5 bg-emerald-100/80 text-emerald-800 rounded-xl text-lg">📝</span>
+              <h2 class="text-base font-bold text-slate-900">作業項目</h2>
+              <span class="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full font-bold">
+                {{ homeworkItems.length }}
+              </span>
+            </div>
+            <button v-if="isEditMode" @click="openAddModal('homework')" class="text-xs text-emerald-700 hover:text-emerald-900 font-bold hover:underline">
+              ＋ 新增
+            </button>
+          </div>
+
+          <div class="space-y-3 flex-1 overflow-y-auto max-h-[58vh]">
+            <div v-if="homeworkItems.length === 0" class="text-center py-10 text-slate-400 text-xs italic">
+              今日暫無作業
+            </div>
+            <div v-for="item in homeworkItems" :key="item.id" class="liquid-item-row p-3 flex flex-col gap-1.5">
+              <div class="flex justify-between items-start gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span v-if="item.subject" class="px-2 py-0.5 text-[11px] bg-emerald-100 text-emerald-800 font-bold rounded-md">
+                    {{ item.subject }}
+                  </span>
+                  <span class="text-sm font-bold text-slate-800 break-all">
+                    {{ item.title }}
+                  </span>
+                </div>
+                <!-- 到期徽章 -->
+                <span v-if="getItemDeadlineInfo(item, currentDate)" :class="getItemDeadlineInfo(item, currentDate).badgeClass" class="text-[11px] px-2 py-0.5 rounded-md border whitespace-nowrap flex-shrink-0">
+                  {{ getItemDeadlineInfo(item, currentDate).badgeText }}
+                </span>
+              </div>
+              <p v-if="item.details" class="text-xs text-slate-600 whitespace-pre-wrap break-words pl-0.5">
+                {{ item.details }}
+              </p>
+              <!-- 編輯/刪除按鈕 (編輯模式下顯示) -->
+              <div v-if="isEditMode" class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
+                <button @click="openEditModal(item)" class="text-[11px] text-slate-500 hover:text-emerald-700 font-medium">編輯</button>
+                <button @click="deleteItem(item)" class="text-[11px] text-slate-400 hover:text-rose-600 font-medium">刪除</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. 考試 (Exam) -->
+        <section class="liquid-glass-card p-5 flex flex-col">
+          <div class="flex justify-between items-center pb-3 mb-3 border-b border-indigo-500/20">
+            <div class="flex items-center gap-2">
+              <span class="p-1.5 bg-indigo-100/80 text-indigo-800 rounded-xl text-lg">📋</span>
+              <h2 class="text-base font-bold text-slate-900">測驗考試</h2>
+              <span class="text-xs px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full font-bold">
+                {{ examItems.length }}
+              </span>
+            </div>
+            <button v-if="isEditMode" @click="openAddModal('exam')" class="text-xs text-indigo-700 hover:text-indigo-900 font-bold hover:underline">
+              ＋ 新增
+            </button>
+          </div>
+
+          <div class="space-y-3 flex-1 overflow-y-auto max-h-[58vh]">
+            <div v-if="examItems.length === 0" class="text-center py-10 text-slate-400 text-xs italic">
+              今日暫無測驗
+            </div>
+            <div v-for="item in examItems" :key="item.id" class="liquid-item-row p-3 flex flex-col gap-1.5">
+              <div class="flex justify-between items-start gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span v-if="item.subject" class="px-2 py-0.5 text-[11px] bg-indigo-100 text-indigo-800 font-bold rounded-md">
+                    {{ item.subject }}
+                  </span>
+                  <span class="text-sm font-bold text-slate-800 break-all">
+                    {{ item.title }}
+                  </span>
+                </div>
+                <span v-if="getItemDeadlineInfo(item, currentDate)" :class="getItemDeadlineInfo(item, currentDate).badgeClass" class="text-[11px] px-2 py-0.5 rounded-md border whitespace-nowrap flex-shrink-0">
+                  {{ getItemDeadlineInfo(item, currentDate).badgeText }}
+                </span>
+              </div>
+              <p v-if="item.details" class="text-xs text-slate-600 whitespace-pre-wrap break-words pl-0.5">
+                {{ item.details }}
+              </p>
+              <div v-if="isEditMode" class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
+                <button @click="openEditModal(item)" class="text-[11px] text-slate-500 hover:text-indigo-700 font-medium">編輯</button>
+                <button @click="deleteItem(item)" class="text-[11px] text-slate-400 hover:text-rose-600 font-medium">刪除</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. 繳交項目 (Submission) -->
+        <section class="liquid-glass-card p-5 flex flex-col">
+          <div class="flex justify-between items-center pb-3 mb-3 border-b border-amber-500/20">
+            <div class="flex items-center gap-2">
+              <span class="p-1.5 bg-amber-100/80 text-amber-800 rounded-xl text-lg">📦</span>
+              <h2 class="text-base font-bold text-slate-900">繳交回條</h2>
+              <span class="text-xs px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full font-bold">
+                {{ submissionItems.length }}
+              </span>
+            </div>
+            <button v-if="isEditMode" @click="openAddModal('submission')" class="text-xs text-amber-700 hover:text-amber-900 font-bold hover:underline">
+              ＋ 新增
+            </button>
+          </div>
+
+          <div class="space-y-3 flex-1 overflow-y-auto max-h-[58vh]">
+            <div v-if="submissionItems.length === 0" class="text-center py-10 text-slate-400 text-xs italic">
+              今日暫無繳交事項
+            </div>
+            <div v-for="item in submissionItems" :key="item.id" class="liquid-item-row p-3 flex flex-col gap-1.5">
+              <div class="flex justify-between items-start gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span v-if="item.subject" class="px-2 py-0.5 text-[11px] bg-amber-100 text-amber-800 font-bold rounded-md">
+                    {{ item.subject }}
+                  </span>
+                  <span class="text-sm font-bold text-slate-800 break-all">
+                    {{ item.title }}
+                  </span>
+                </div>
+                <span v-if="getItemDeadlineInfo(item, currentDate)" :class="getItemDeadlineInfo(item, currentDate).badgeClass" class="text-[11px] px-2 py-0.5 rounded-md border whitespace-nowrap flex-shrink-0">
+                  {{ getItemDeadlineInfo(item, currentDate).badgeText }}
+                </span>
+              </div>
+              <p v-if="item.details" class="text-xs text-slate-600 whitespace-pre-wrap break-words pl-0.5">
+                {{ item.details }}
+              </p>
+              <div v-if="isEditMode" class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
+                <button @click="openEditModal(item)" class="text-[11px] text-slate-500 hover:text-amber-700 font-medium">編輯</button>
+                <button @click="deleteItem(item)" class="text-[11px] text-slate-400 hover:text-rose-600 font-medium">刪除</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. 提醒事項 (Reminder) -->
+        <section class="liquid-glass-card p-5 flex flex-col">
+          <div class="flex justify-between items-center pb-3 mb-3 border-b border-rose-500/20">
+            <div class="flex items-center gap-2">
+              <span class="p-1.5 bg-rose-100/80 text-rose-800 rounded-xl text-lg">📢</span>
+              <h2 class="text-base font-bold text-slate-900">重要提醒</h2>
+              <span class="text-xs px-2 py-0.5 bg-rose-50 text-rose-700 rounded-full font-bold">
+                {{ reminderItems.length }}
+              </span>
+            </div>
+            <button v-if="isEditMode" @click="openAddModal('reminder')" class="text-xs text-rose-700 hover:text-rose-900 font-bold hover:underline">
+              ＋ 新增
+            </button>
+          </div>
+
+          <div class="space-y-3 flex-1 overflow-y-auto max-h-[58vh]">
+            <div v-if="reminderItems.length === 0" class="text-center py-10 text-slate-400 text-xs italic">
+              今日無提醒事項
+            </div>
+            <div v-for="item in reminderItems" :key="item.id" class="liquid-item-row p-3 flex flex-col gap-1.5">
+              <div class="flex justify-between items-start gap-2">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span v-if="item.subject" class="px-2 py-0.5 text-[11px] bg-rose-100 text-rose-800 font-bold rounded-md">
+                    {{ item.subject }}
+                  </span>
+                  <span class="text-sm font-bold text-slate-800 break-all">
+                    {{ item.title }}
+                  </span>
+                </div>
+                <span v-if="getItemDeadlineInfo(item, currentDate)" :class="getItemDeadlineInfo(item, currentDate).badgeClass" class="text-[11px] px-2 py-0.5 rounded-md border whitespace-nowrap flex-shrink-0">
+                  {{ getItemDeadlineInfo(item, currentDate).badgeText }}
+                </span>
+              </div>
+              <p v-if="item.details" class="text-xs text-slate-600 whitespace-pre-wrap break-words pl-0.5">
+                {{ item.details }}
+              </p>
+              <div v-if="isEditMode" class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
+                <button @click="openEditModal(item)" class="text-[11px] text-slate-500 hover:text-rose-700 font-medium">編輯</button>
+                <button @click="deleteItem(item)" class="text-[11px] text-slate-400 hover:text-rose-600 font-medium">刪除</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="liquid-glass-nav mt-auto py-4 text-center text-xs text-slate-400">
+      <p class="font-medium text-slate-500">© Rhythm Byte · 某劉姓同學訂製版</p>
+    </footer>
+
+    <!-- 新增 / 修改項目彈窗 -->
+    <template v-if="showEditModal">
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+        <div class="liquid-modal-panel max-w-lg w-full p-5 sm:p-7 border border-white/90 flex flex-col max-h-[88vh] shadow-2xl">
+          
+          <div class="flex justify-between items-center pb-4 border-b border-slate-200/60 flex-shrink-0">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xl p-2 bg-emerald-100/70 text-emerald-700 rounded-2xl">✏️</span>
+              <div>
+                <h3 class="text-lg font-bold text-slate-900">
+                  {{ isEditingExisting ? '修改聯絡簿項目' : '新增聯絡簿項目' }}
+                </h3>
+                <p class="text-xs text-slate-500">填寫項目內容、科目與截止日期</p>
+              </div>
+            </div>
+            <button @click="showEditModal = false" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-800 transition">✕</button>
+          </div>
+
+          <form id="editItemForm" @submit.prevent="submitItemForm" class="mt-4 space-y-4 overflow-y-auto flex-1 px-1 pt-1.5 pb-2.5" style="scroll-padding: 0.75rem;">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">主要類別</label>
+              <div class="grid grid-cols-4 gap-2">
+                <button type="button" @click="formItem.category = 'homework'" :class="formItem.category === 'homework' ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-500/30' : 'liquid-glass-pill text-slate-700 hover:text-slate-900'" class="py-2 text-xs rounded-xl transition font-medium">
+                  📝 作業
+                </button>
+                <button type="button" @click="formItem.category = 'exam'" :class="formItem.category === 'exam' ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-500/30' : 'liquid-glass-pill text-slate-700 hover:text-slate-900'" class="py-2 text-xs rounded-xl transition font-medium">
+                  📋 考試
+                </button>
+                <button type="button" @click="formItem.category = 'submission'" :class="formItem.category === 'submission' ? 'bg-amber-600 text-white font-bold shadow-md shadow-amber-500/30' : 'liquid-glass-pill text-slate-700 hover:text-slate-900'" class="py-2 text-xs rounded-xl transition font-medium">
+                  📦 繳交
+                </button>
+                <button type="button" @click="formItem.category = 'reminder'" :class="formItem.category === 'reminder' ? 'bg-rose-600 text-white font-bold shadow-md shadow-rose-500/30' : 'liquid-glass-pill text-slate-700 hover:text-slate-900'" class="py-2 text-xs rounded-xl transition font-medium">
+                  📢 提醒
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">聯絡簿日期</label>
+                <input type="date" v-model="formItem.date" required class="w-full liquid-input rounded-xl px-5 py-2.5 text-sm focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1.5">科目／單位 (選填)</label>
+                <input type="text" v-model="formItem.subject" placeholder="請輸入科目或單位" class="w-full liquid-input rounded-xl px-5 py-2.5 text-sm focus:outline-none">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">項目名稱／內容 <span class="text-rose-500">*</span></label>
+              <input type="text" v-model="formItem.title" required placeholder="請輸入項目名稱或內容" class="w-full liquid-input rounded-xl px-5 py-2.5 text-sm focus:outline-none font-medium">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">詳細說明／範圍／備註 (選填)</label>
+              <textarea v-model="formItem.details" rows="3" placeholder="請輸入詳細說明或備註" class="w-full liquid-input rounded-xl px-5 py-2.5 text-sm focus:outline-none"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">繳交或測驗截止日 (選填)</label>
+              <input type="date" v-model="formItem.dueDate" class="w-full liquid-input rounded-xl px-5 py-2.5 text-sm focus:outline-none">
+            </div>
+          </form>
+
+          <div class="pt-3.5 mt-2 border-t border-slate-200/60 flex justify-end items-center gap-2.5 flex-shrink-0">
+            <button type="button" @click="showEditModal = false" class="liquid-glass-pill px-5 py-2.5 text-slate-700 text-sm font-semibold hover:bg-slate-200/70 transition">
+              取消
+            </button>
+            <button type="submit" form="editItemForm" :disabled="isSaving" class="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 px-6 py-2.5 text-white text-sm font-bold rounded-xl shadow-md transition">
+              {{ isSaving ? '儲存中...' : '確定儲存' }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </template>
+
+    <!-- 訊息提示 (Toast) -->
+    <div v-if="toast.show" class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-5 py-3.5 rounded-2xl shadow-2xl text-white text-sm font-semibold transition backdrop-blur-xl border border-white/30"
+         :class="{
+           'bg-emerald-600/90 shadow-emerald-500/25': toast.type === 'success',
+           'bg-rose-600/90 shadow-rose-500/25': toast.type === 'error',
+           'bg-slate-900/90 shadow-slate-900/25': toast.type === 'info'
+         }">
+      <span class="text-base">{{ toast.type === 'success' ? '✓' : toast.type === 'error' ? '⚠️' : 'ℹ️' }}</span>
+      <span>{{ toast.message }}</span>
+    </div>
+
+  </div>
+
+  <!-- Firebase App & Realtime Database SDK (Compat CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+  <script src="js/config.js"></script>
+  <script src="js/firebase-sync.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
