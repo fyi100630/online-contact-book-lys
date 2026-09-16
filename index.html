@@ -180,84 +180,83 @@
   <div id="app" v-cloak class="relative z-10 flex flex-col flex-1">
 
     <!-- 頂端導航列 -->
-    <header class="sticky top-0 z-40 liquid-glass-nav py-3.5 px-4 sm:px-8">
-      <div class="max-w-[1700px] mx-auto flex justify-between items-center gap-4">
+    <header class="sticky top-0 z-40 liquid-glass-nav py-2.5 sm:py-3.5 px-3 sm:px-8 shadow-xs">
+      <div class="max-w-[1700px] mx-auto flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2 sm:gap-4">
         
         <!-- 標題與日期 -->
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white shadow-md shadow-emerald-500/25 text-xl font-bold">
-            📖
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h1 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-tight">
-                {{ classTitle }}
-              </h1>
-              <span v-if="isSaving" class="text-[10px] text-amber-700 bg-amber-100/80 border border-amber-300/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span> 同步儲存中
-              </span>
-              <span v-else-if="isCloudConnected" class="text-[10px] text-emerald-700 bg-emerald-100/80 border border-emerald-300/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 即時連線中
-              </span>
-              <span v-else-if="hasFirebaseConfig" class="text-[10px] text-amber-700 bg-amber-100/80 border border-amber-300/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> 連線中...
-              </span>
-              <span v-else class="text-[10px] text-slate-600 bg-slate-100/80 border border-slate-300/60 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> 本機模式
-              </span>
+        <div class="flex items-center justify-between sm:justify-start gap-2.5 sm:gap-3 min-w-0">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white shadow-md shadow-emerald-500/25 text-lg sm:text-xl font-bold flex-shrink-0">
+              📖
             </div>
-            <p class="text-xs text-slate-500 font-medium">
-              {{ formatDateWithWeekday(currentDate) }}
-            </p>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                <h1 class="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-tight whitespace-nowrap flex-shrink-0">
+                  {{ classTitle }}
+                </h1>
+                <span v-if="isSaving" class="text-[10.5px] sm:text-xs text-amber-700 bg-amber-100/90 border border-amber-300/70 px-2 py-0.5 rounded-full font-medium flex items-center gap-1 whitespace-nowrap flex-shrink-0">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span> 同步儲存中
+                </span>
+                <span v-else-if="isCloudConnected" class="text-[10.5px] sm:text-xs text-emerald-700 bg-emerald-100/90 border border-emerald-300/70 px-2 py-0.5 rounded-full font-semibold flex items-center gap-1 whitespace-nowrap flex-shrink-0">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 即時連線中
+                </span>
+                <span v-else-if="hasFirebaseConfig" class="text-[10.5px] sm:text-xs text-amber-700 bg-amber-100/90 border border-amber-300/70 px-2 py-0.5 rounded-full font-medium flex items-center gap-1 whitespace-nowrap flex-shrink-0">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> 連線中...
+                </span>
+                <span v-else class="text-[10.5px] sm:text-xs text-slate-600 bg-slate-100/90 border border-slate-300/70 px-2 py-0.5 rounded-full font-medium flex items-center gap-1 whitespace-nowrap flex-shrink-0">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> 本機模式
+                </span>
+              </div>
+              <p class="text-[11px] sm:text-xs text-slate-500 font-medium whitespace-nowrap overflow-hidden text-ellipsis mt-0.5">
+                {{ formatDateWithWeekday(currentDate) }}
+              </p>
+            </div>
           </div>
         </div>
 
-        <!-- 右側操作按鈕群 -->
-        <div class="flex items-center gap-2.5">
+        <!-- 右側操作按鈕群 (手機版成獨立排、左右分配、按鈕不折字) -->
+        <div class="flex items-center justify-between sm:justify-end gap-2 flex-nowrap flex-shrink-0 pt-1.5 sm:pt-0 border-t sm:border-t-0 border-slate-200/50">
           <!-- 檢視模式切換 (本日 / 全部) -->
-          <div class="inline-flex liquid-glass-pill p-1">
-            <button @click="viewMode = 'daily'" :class="viewMode === 'daily' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'" class="px-3 py-1 text-xs rounded-full transition">
+          <div class="inline-flex liquid-glass-pill p-0.5 sm:p-1 flex-shrink-0">
+            <button @click="viewMode = 'daily'" :class="viewMode === 'daily' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'" class="px-2.5 sm:px-3 py-1 text-xs rounded-full transition whitespace-nowrap">
               本日
             </button>
-            <button @click="viewMode = 'all'" :class="viewMode === 'all' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'" class="px-3 py-1 text-xs rounded-full transition">
+            <button @click="viewMode = 'all'" :class="viewMode === 'all' ? 'bg-white text-slate-900 font-bold shadow-xs' : 'text-slate-600 hover:text-slate-900'" class="px-2.5 sm:px-3 py-1 text-xs rounded-full transition whitespace-nowrap">
               全部
             </button>
           </div>
 
-          <!-- 編輯模式切換開關 (防呆防誤觸) -->
-          <button @click="isEditMode = !isEditMode" :class="isEditMode ? 'bg-emerald-600 text-white font-bold shadow-md shadow-emerald-500/30' : 'liquid-glass-pill text-slate-700 hover:text-slate-900 font-medium'" class="px-3.5 py-1.5 text-xs rounded-full transition flex items-center gap-1">
-            <span>{{ isEditMode ? '✏️ 編輯模式中' : '👁️ 唯讀模式' }}</span>
-          </button>
-
-          <!-- 新增項目按鈕 (僅編輯模式顯示) -->
-          <button v-if="isEditMode" @click="openAddModal('homework')" class="px-3.5 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-full shadow-md shadow-emerald-500/30 transition flex items-center gap-1">
-            <span>＋ 新增</span>
-          </button>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <!-- 新增項目按鈕 (常態編輯模式) -->
+            <button @click="openAddModal('homework')" class="px-3.5 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-full shadow-md shadow-emerald-500/30 transition flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
+              <span>＋ 新增項目</span>
+            </button>
+          </div>
         </div>
 
       </div>
     </header>
 
     <!-- 主要內容區 -->
-    <main class="max-w-[1700px] w-full mx-auto px-4 sm:px-8 py-6 flex-1 flex flex-col gap-6">
+    <main class="max-w-[1700px] w-full mx-auto px-3 sm:px-8 py-4 sm:py-6 flex-1 flex flex-col gap-4 sm:gap-6">
 
       <!-- 日期切換操作列 (在本日模式下顯示) -->
-      <div v-if="viewMode === 'daily'" class="liquid-glass-card p-4 flex flex-wrap justify-between items-center gap-3">
-        <div class="flex items-center gap-2">
-          <button @click="changeDay(-1)" class="liquid-glass-pill px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-white">
+      <div v-if="viewMode === 'daily'" class="liquid-glass-card p-3 sm:p-4 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 sm:gap-3">
+        <div class="flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2">
+          <button @click="changeDay(-1)" class="liquid-glass-pill px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-white flex-1 sm:flex-initial text-center whitespace-nowrap">
             ◀ 前一日
           </button>
-          <button @click="goToday" :disabled="isToday" class="liquid-glass-pill px-3.5 py-1.5 text-xs font-semibold text-slate-700 disabled:opacity-40 hover:bg-white">
+          <button @click="goToday" :disabled="isToday" class="liquid-glass-pill px-3.5 py-1.5 text-xs font-semibold text-slate-700 disabled:opacity-40 hover:bg-white flex-1 sm:flex-initial text-center whitespace-nowrap">
             今日
           </button>
-          <button @click="changeDay(1)" class="liquid-glass-pill px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-white">
+          <button @click="changeDay(1)" class="liquid-glass-pill px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-white flex-1 sm:flex-initial text-center whitespace-nowrap">
             後一日 ▶
           </button>
         </div>
 
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-slate-500 font-medium hidden sm:inline">選擇日期：</span>
-          <input id="mainDatePickerInput" type="date" v-model="currentDate" class="liquid-glass-pill px-3 py-1.5 text-xs text-slate-800 font-bold focus:outline-none cursor-pointer">
+        <div class="flex items-center justify-between sm:justify-end gap-2">
+          <span class="text-xs text-slate-500 font-medium whitespace-nowrap">選擇日期：</span>
+          <input id="mainDatePickerInput" type="date" v-model="currentDate" class="liquid-glass-pill px-3 py-1.5 text-xs text-slate-800 font-bold focus:outline-none cursor-pointer flex-1 sm:flex-initial text-center">
         </div>
       </div>
 
@@ -274,7 +273,7 @@
                 {{ homeworkItems.length }}
               </span>
             </div>
-            <button v-if="isEditMode" @click="openAddModal('homework')" class="text-xs text-emerald-700 hover:text-emerald-900 font-bold hover:underline">
+            <button @click="openAddModal('homework')" class="text-xs text-emerald-700 hover:text-emerald-900 font-bold hover:underline">
               ＋ 新增
             </button>
           </div>
@@ -302,7 +301,7 @@
                 {{ item.details }}
               </p>
               <!-- 編輯/刪除按鈕 (編輯模式下顯示) -->
-              <div v-if="isEditMode" class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
+              <div class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
                 <button @click="openEditModal(item)" class="text-[11px] text-slate-500 hover:text-emerald-700 font-medium">編輯</button>
                 <button @click="deleteItem(item)" class="text-[11px] text-slate-400 hover:text-rose-600 font-medium">刪除</button>
               </div>
@@ -320,7 +319,7 @@
                 {{ examItems.length }}
               </span>
             </div>
-            <button v-if="isEditMode" @click="openAddModal('exam')" class="text-xs text-indigo-700 hover:text-indigo-900 font-bold hover:underline">
+            <button @click="openAddModal('exam')" class="text-xs text-indigo-700 hover:text-indigo-900 font-bold hover:underline">
               ＋ 新增
             </button>
           </div>
@@ -346,7 +345,7 @@
               <p v-if="item.details" class="text-xs text-slate-600 whitespace-pre-wrap break-words pl-0.5">
                 {{ item.details }}
               </p>
-              <div v-if="isEditMode" class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
+              <div class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
                 <button @click="openEditModal(item)" class="text-[11px] text-slate-500 hover:text-indigo-700 font-medium">編輯</button>
                 <button @click="deleteItem(item)" class="text-[11px] text-slate-400 hover:text-rose-600 font-medium">刪除</button>
               </div>
@@ -364,7 +363,7 @@
                 {{ submissionItems.length }}
               </span>
             </div>
-            <button v-if="isEditMode" @click="openAddModal('submission')" class="text-xs text-amber-700 hover:text-amber-900 font-bold hover:underline">
+            <button @click="openAddModal('submission')" class="text-xs text-amber-700 hover:text-amber-900 font-bold hover:underline">
               ＋ 新增
             </button>
           </div>
@@ -390,7 +389,7 @@
               <p v-if="item.details" class="text-xs text-slate-600 whitespace-pre-wrap break-words pl-0.5">
                 {{ item.details }}
               </p>
-              <div v-if="isEditMode" class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
+              <div class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
                 <button @click="openEditModal(item)" class="text-[11px] text-slate-500 hover:text-amber-700 font-medium">編輯</button>
                 <button @click="deleteItem(item)" class="text-[11px] text-slate-400 hover:text-rose-600 font-medium">刪除</button>
               </div>
@@ -408,7 +407,7 @@
                 {{ reminderItems.length }}
               </span>
             </div>
-            <button v-if="isEditMode" @click="openAddModal('reminder')" class="text-xs text-rose-700 hover:text-rose-900 font-bold hover:underline">
+            <button @click="openAddModal('reminder')" class="text-xs text-rose-700 hover:text-rose-900 font-bold hover:underline">
               ＋ 新增
             </button>
           </div>
@@ -434,7 +433,7 @@
               <p v-if="item.details" class="text-xs text-slate-600 whitespace-pre-wrap break-words pl-0.5">
                 {{ item.details }}
               </p>
-              <div v-if="isEditMode" class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
+              <div class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
                 <button @click="openEditModal(item)" class="text-[11px] text-slate-500 hover:text-rose-700 font-medium">編輯</button>
                 <button @click="deleteItem(item)" class="text-[11px] text-slate-400 hover:text-rose-600 font-medium">刪除</button>
               </div>
