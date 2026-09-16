@@ -242,7 +242,10 @@ createApp({
     async function deleteItem(item) {
       if (!confirm(`確定要刪除「${item.title}」嗎？`)) return;
 
-      const updatedList = records.value.filter((r) => r.id !== item.id);
+      const updatedList = records.value.filter((r) => {
+        if (item.id && r.id) return r.id !== item.id;
+        return !(r.title === item.title && r.category === item.category && r.date === item.date);
+      });
       records.value = updatedList;
       showToast('刪除中...', 'info');
 
@@ -262,8 +265,8 @@ createApp({
     }
 
     onMounted(() => {
-      // 1. 若本機快取是空的，載入 records.json 作為範例
-      if (records.value.length === 0) {
+      // 1. 只有在完全未配置 Firebase 且本機無任何快取時，才讀取 records.json 作為初始範例
+      if (!hasFirebaseConfig.value && records.value.length === 0 && !localStorage.getItem(FirebaseSync.LOCAL_STORAGE_KEY)) {
         fetch('data/records.json')
           .then((res) => res.json())
           .then((data) => {

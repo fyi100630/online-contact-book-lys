@@ -100,25 +100,6 @@ const FirebaseSync = {
             records = Object.values(val);
           }
 
-          // 雲端若為空，但本機已有既有資料或種子資料，自動上傳初始化
-          if (records.length === 0 && val === null) {
-            const localCached = this.getCachedData();
-            if (localCached.length > 0) {
-              this.saveData(localCached);
-              return;
-            }
-            fetch('data/records.json')
-              .then((res) => res.json())
-              .then((data) => {
-                const list = Array.isArray(data.records) ? data.records : (Array.isArray(data) ? data : []);
-                if (list.length > 0) {
-                  this.saveData(this.normalizeRecords(list));
-                }
-              })
-              .catch(() => {});
-            return;
-          }
-
           const cleanRecords = this.normalizeRecords(records);
 
           // 快取至本機
@@ -155,7 +136,11 @@ const FirebaseSync = {
     // 2. 若有連線 Firebase，寫入雲端（~50ms）
     if (this.db) {
       try {
-        await this.db.ref('records').set(cleanRecords);
+        if (cleanRecords.length === 0) {
+          await this.db.ref('records').remove();
+        } else {
+          await this.db.ref('records').set(cleanRecords);
+        }
         return { success: true, source: 'firebase' };
       } catch (err) {
         console.error('Firebase 雲端寫入失敗：', err);
