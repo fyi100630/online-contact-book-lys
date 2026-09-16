@@ -27,7 +27,7 @@ createApp({
     const isLoading = ref(false);
     const isCloudConnected = ref(false);
     const isSaving = ref(false);
-    const isEditMode = ref(false); // 唯讀 / 編輯模式開關
+    const isEditMode = ref(true); // 常態編輯模式
     const hasFirebaseConfig = computed(() => Boolean(appConfig.firebaseDatabaseUrl && appConfig.firebaseDatabaseUrl.trim()));
 
     const toast = reactive({
