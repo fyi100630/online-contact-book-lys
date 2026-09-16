@@ -249,14 +249,34 @@ createApp({
       }
     }
 
-    async function deleteItem(item) {
-      if (!confirm(`確定要刪除「${item.title}」嗎？`)) return;
+    // 刪除確認彈窗 (自訂 Vue 模態窗，徹底解決手機瀏覽器阻擋原生 confirm 的問題)
+    const deleteConfirmModal = reactive({
+      show: false,
+      item: null
+    });
+
+    function confirmDelete(item) {
+      deleteConfirmModal.item = item;
+      deleteConfirmModal.show = true;
+    }
+
+    function cancelDelete() {
+      deleteConfirmModal.show = false;
+      deleteConfirmModal.item = null;
+    }
+
+    async function executeDelete() {
+      const item = deleteConfirmModal.item;
+      if (!item) return;
 
       const updatedList = records.value.filter((r) => {
-        if (item.id && r.id) return r.id !== item.id;
+        if (item.id && r.id) return String(r.id) !== String(item.id);
         return !(r.title === item.title && r.category === item.category && r.date === item.date);
       });
+
       records.value = updatedList;
+      deleteConfirmModal.show = false;
+      deleteConfirmModal.item = null;
       showToast('刪除中...', 'info');
 
       isSaving.value = true;
@@ -272,6 +292,11 @@ createApp({
       } finally {
         isSaving.value = false;
       }
+    }
+
+    // 保留 deleteItem 相容性
+    function deleteItem(item) {
+      confirmDelete(item);
     }
 
     onMounted(() => {
@@ -336,7 +361,11 @@ createApp({
       openAddModal,
       openEditModal,
       submitItemForm,
-      deleteItem
+      deleteItem,
+      deleteConfirmModal,
+      confirmDelete,
+      cancelDelete,
+      executeDelete
     };
   }
 }).mount('#app');

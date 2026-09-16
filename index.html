@@ -303,7 +303,7 @@
               <!-- 編輯/刪除按鈕 (編輯模式下顯示) -->
               <div class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
                 <button @click="openEditModal(item)" class="px-2.5 py-1 text-xs text-slate-500 hover:text-slate-800 hover:bg-slate-100/80 rounded-lg transition font-medium">編輯</button>
-                <button @click="deleteItem(item)" class="px-2.5 py-1 text-xs text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition font-medium">刪除</button>
+                <button @click="confirmDelete(item)" class="px-2.5 py-1 text-xs text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition font-medium">刪除</button>
               </div>
             </div>
           </div>
@@ -347,7 +347,7 @@
               </p>
               <div class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
                 <button @click="openEditModal(item)" class="px-2.5 py-1 text-xs text-slate-500 hover:text-slate-800 hover:bg-slate-100/80 rounded-lg transition font-medium">編輯</button>
-                <button @click="deleteItem(item)" class="px-2.5 py-1 text-xs text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition font-medium">刪除</button>
+                <button @click="confirmDelete(item)" class="px-2.5 py-1 text-xs text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition font-medium">刪除</button>
               </div>
             </div>
           </div>
@@ -391,7 +391,7 @@
               </p>
               <div class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
                 <button @click="openEditModal(item)" class="px-2.5 py-1 text-xs text-slate-500 hover:text-slate-800 hover:bg-slate-100/80 rounded-lg transition font-medium">編輯</button>
-                <button @click="deleteItem(item)" class="px-2.5 py-1 text-xs text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition font-medium">刪除</button>
+                <button @click="confirmDelete(item)" class="px-2.5 py-1 text-xs text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition font-medium">刪除</button>
               </div>
             </div>
           </div>
@@ -435,7 +435,7 @@
               </p>
               <div class="flex justify-end gap-2 pt-1 border-t border-slate-100/60 mt-1">
                 <button @click="openEditModal(item)" class="px-2.5 py-1 text-xs text-slate-500 hover:text-slate-800 hover:bg-slate-100/80 rounded-lg transition font-medium">編輯</button>
-                <button @click="deleteItem(item)" class="px-2.5 py-1 text-xs text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition font-medium">刪除</button>
+                <button @click="confirmDelete(item)" class="px-2.5 py-1 text-xs text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition font-medium">刪除</button>
               </div>
             </div>
           </div>
@@ -527,6 +527,40 @@
       </div>
     </template>
 
+    <!-- 刪除確認彈窗 (Vue 模態窗，徹底解決手機瀏覽器阻擋原生 confirm 的問題) -->
+    <template v-if="deleteConfirmModal.show">
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+        <div class="liquid-modal-panel max-w-sm w-full p-5 sm:p-6 border border-white/90 flex flex-col shadow-2xl">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-2xl bg-rose-100 flex items-center justify-center text-rose-600 text-lg font-bold flex-shrink-0">
+              🗑️
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-900">確認要刪除嗎？</h3>
+              <p class="text-xs text-slate-500 mt-0.5">刪除後將即時從所有裝置同步移除</p>
+            </div>
+          </div>
+          <div class="p-3 bg-slate-50/90 rounded-xl border border-slate-200/60 my-2">
+            <span class="text-xs font-bold text-rose-600 mr-1.5" v-if="deleteConfirmModal.item?.subject">
+              [{{ deleteConfirmModal.item.subject }}]
+            </span>
+            <span class="text-sm font-bold text-slate-800 break-all">
+              {{ deleteConfirmModal.item?.title }}
+            </span>
+          </div>
+          <div class="flex justify-end gap-2.5 mt-4 pt-3 border-t border-slate-200/60">
+            <button type="button" @click="cancelDelete" class="liquid-glass-pill px-4 py-2 text-slate-700 text-xs font-semibold hover:bg-slate-200/70 transition">
+              取消
+            </button>
+            <button type="button" @click="executeDelete" :disabled="isSaving" class="bg-rose-600 hover:bg-rose-700 disabled:opacity-50 px-4 py-2 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-1.5">
+              <span v-if="isSaving" class="animate-spin text-xs">⏳</span>
+              <span>確定刪除</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </template>
+
     <!-- 訊息提示 (Toast) -->
     <div v-if="toast.show" class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-5 py-3.5 rounded-2xl shadow-2xl text-white text-sm font-semibold transition backdrop-blur-xl border border-white/30"
          :class="{
@@ -544,8 +578,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
-  <script src="js/config.js?v=1.1.0"></script>
-  <script src="js/firebase-sync.js?v=1.1.0"></script>
-  <script src="js/app.js?v=1.1.0"></script>
+  <script src="js/config.js?v=2.0.0"></script>
+  <script src="js/firebase-sync.js?v=2.0.0"></script>
+  <script src="js/app.js?v=2.0.0"></script>
 </body>
 </html>

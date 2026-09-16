@@ -1,41 +1,4 @@
 {
   "classTitle": "班級聯絡簿",
-  "records": [
-    {
-      "id": "sample-1",
-      "date": "2026-09-16",
-      "category": "homework",
-      "subject": "國文",
-      "title": "國文習作第 12~14 頁",
-      "details": "請認真書寫並確實訂正錯別字",
-      "dueDate": "2026-09-17"
-    },
-    {
-      "id": "sample-2",
-      "date": "2026-09-16",
-      "category": "exam",
-      "subject": "數學",
-      "title": "第一單元小考",
-      "details": "範圍：1-1 至 1-3",
-      "dueDate": "2026-09-18"
-    },
-    {
-      "id": "sample-3",
-      "date": "2026-09-16",
-      "category": "submission",
-      "subject": "學務處",
-      "title": "繳交家長同意書與回條",
-      "details": "請務必請家長簽章",
-      "dueDate": "2026-09-19"
-    },
-    {
-      "id": "sample-4",
-      "date": "2026-09-16",
-      "category": "reminder",
-      "subject": "班務",
-      "title": "明天穿著全套體育服",
-      "details": "第二節有體育課，請記得帶水壺",
-      "dueDate": ""
-    }
-  ]
+  "records": []
 }

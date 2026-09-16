@@ -95,9 +95,11 @@ const FirebaseSync = {
           const val = snapshot.val();
           let records = [];
           if (Array.isArray(val)) {
-            records = val.filter(Boolean);
+            records = val.filter(r => r && typeof r === 'object' && r.id && !r.__empty);
           } else if (val && typeof val === 'object') {
-            records = Object.values(val);
+            if (!val.__empty) {
+              records = Object.values(val).filter(r => r && typeof r === 'object' && r.id && !r.__empty);
+            }
           }
 
           const cleanRecords = this.normalizeRecords(records);
@@ -137,7 +139,8 @@ const FirebaseSync = {
     if (this.db) {
       try {
         if (cleanRecords.length === 0) {
-          await this.db.ref('records').remove();
+          // 寫入空狀態標記物件，避免節點為 null 觸發舊版客戶端自動回填 bug
+          await this.db.ref('records').set({ __empty: true, updatedAt: Date.now() });
         } else {
           await this.db.ref('records').set(cleanRecords);
         }
